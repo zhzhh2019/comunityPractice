@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
 
 
 @Controller
@@ -28,7 +31,9 @@ public class AuthorizeController {
 
 
     @GetMapping("/callback")
-    public String callback(@RequestParam("code") String code){
+    public String callback(@RequestParam("code") String code,
+                           HttpServletRequest request,
+                           Model model){
 
         AccessTokenDTO accessTokenDTO = new AccessTokenDTO();
         accessTokenDTO.setCode(code);
@@ -39,10 +44,14 @@ public class AuthorizeController {
         String accessToken = githubProvider.getAccessToken(accessTokenDTO);
         GitHunUser user = githubProvider.getUser(accessToken);
 
-        System.err.println("github authorise code:"+code);
-        System.err.println("user name "+user.getName());
+        if(user != null){
+            //登陆成功，写cookie和 session
+            request.getSession().setAttribute("user",user);
+            return "redirect:/index";//重定向到 首页
 
-        return "index";
+        }else{
+            return "redirect:/index";
+        }
     }
 
 

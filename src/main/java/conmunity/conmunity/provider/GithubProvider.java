@@ -58,7 +58,7 @@ public class GithubProvider {
             String string = response.body().string();
 
             GitHunUser user = JSON.parseObject(string,GitHunUser.class);
-
+            System.err.println("githubusername:"+user.getName());
             return user;
         } catch (IOException e) {
             e.printStackTrace();
